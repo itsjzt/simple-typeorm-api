@@ -1,7 +1,12 @@
-# Awesome Project Build with TypeORM
+**Idea**
+A simple bookmarking app
 
-Steps to run this project:
+**user story**
+As a user, I can
+- create an account on the site with email and password
+- login back to my account by entering same credentials
+- add a new bookmark in my list
+- click on any existing bookmark to go on the site
+- delete a bookmark
+- logout (optional)
 
-1. Run `npm i` command
-2. Setup database settings inside `ormconfig.json` file
-3. Run `npm start` command

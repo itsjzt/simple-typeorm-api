@@ -1,26 +1,42 @@
-import {getRepository} from "typeorm";
-import {NextFunction, Request, Response} from "express";
-import {User} from "../entity/User";
+import { getRepository } from "typeorm";
+import { Request, Response } from "express";
+import { User } from "../entity/User";
+import * as crypto from 'crypto'
+import { sign, decode } from 'jsonwebtoken'
 
-export class UserController {
+const userRepository = () => getRepository(User);
+const JWT_SECRET = process.env.JWT_SECRET
 
-    private userRepository = getRepository(User);
-
-    async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find();
+export async function login(req: Request, res: Response) {
+    let { email, password } = req.body
+    password = crypto.createHmac('sha256', password).digest('hex')
+    const user = await userRepository().findOne({ email, password })
+    if (!user) {
+        return res
+            .status(400)
+            .render('loginPage', { message: 'Wrong credentails, try again' })
     }
 
-    async one(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.findOne(request.params.id);
-    }
+    res.cookie('token', sign({ id: user.id, email: user.email }, JWT_SECRET), { maxAge: 900000, httpOnly: true });
+    return res.redirect('/')
+}
 
-    async save(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.save(request.body);
-    }
+export async function signup(req: Request, res: Response) {
+    let { email, password } = req.body
+    password = crypto.createHmac('sha256', this.password).digest('hex')
+    const user = await userRepository().save({ email, password });
+    res.cookie('token', sign(user, JWT_SECRET), { maxAge: 900000, httpOnly: true });
+    return res.redirect('/')
+}
 
-    async remove(request: Request, response: Response, next: NextFunction) {
-        let userToRemove = await this.userRepository.findOne(request.params.id);
-        await this.userRepository.remove(userToRemove);
-    }
+export function signupPage(req: Request, res: Response) {
+    return res.render('signupPage')
+}
 
+export function loginPage(req: Request, res: Response) {
+    return res.render('loginPage')
+}
+
+export function bookmarkPage(req: Request, res: Response) {
+    res.render('bookmark')
 }

@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import * as crypto from 'crypto';
+
 
 @Entity()
 export class User {
@@ -7,12 +9,9 @@ export class User {
     id: number;
 
     @Column()
-    firstName: string;
+    email: string;
 
     @Column()
-    lastName: string;
-
-    @Column()
-    age: number;
+    password: string;
 
 }
