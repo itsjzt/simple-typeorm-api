@@ -2,9 +2,12 @@ import { getRepository } from "typeorm";
 import { Request, Response } from "express";
 import { User } from "../entity/User";
 import * as crypto from 'crypto'
-import { sign, decode } from 'jsonwebtoken'
+import { sign } from 'jsonwebtoken'
+import { getUserId } from "./AuthController";
+import { Bookmark } from "../entity/Bookmark";
 
 const userRepository = () => getRepository(User);
+const bookmarkResitory = () => getRepository(Bookmark);
 const JWT_SECRET = process.env.JWT_SECRET
 
 export async function login(req: Request, res: Response) {
@@ -23,7 +26,7 @@ export async function login(req: Request, res: Response) {
 
 export async function signup(req: Request, res: Response) {
     let { email, password } = req.body
-    password = crypto.createHmac('sha256', this.password).digest('hex')
+    password = crypto.createHmac('sha256', password).digest('hex')
     const user = await userRepository().save({ email, password });
     res.cookie('token', sign(user, JWT_SECRET), { maxAge: 900000, httpOnly: true });
     return res.redirect('/')
@@ -37,6 +40,20 @@ export function loginPage(req: Request, res: Response) {
     return res.render('loginPage')
 }
 
-export function bookmarkPage(req: Request, res: Response) {
-    res.render('bookmark')
+export async function bookmarkPage(req: Request, res: Response) {
+    const userId = getUserId(req)
+
+    const bookmarks = await bookmarkResitory().find({ where: { author: { id: userId } } })
+    res.render('bookmarkPage', { bookmarks, userId })
+}
+
+export async function createBookmark(req: Request, res: Response) {
+    const { title, link } = req.body
+    await bookmarkResitory().save({
+        title,
+        link,
+        authorId: getUserId(req)
+    })
+
+    res.redirect('/')
 }

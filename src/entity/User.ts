@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
-import * as crypto from 'crypto';
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Bookmark } from "./Bookmark";
 
 @Entity()
 export class User {
@@ -14,4 +13,6 @@ export class User {
     @Column()
     password: string;
 
+    @OneToMany(() => Bookmark, bookmark => bookmark.author)
+    bookmarks: Bookmark[]
 }

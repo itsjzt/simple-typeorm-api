@@ -4,7 +4,8 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as path from 'path'
 import * as cookieParser from 'cookie-parser'
-import { login, signup, signupPage, loginPage, bookmarkPage } from "./controller/UserController";
+import { login, signup, signupPage, loginPage, bookmarkPage, createBookmark } from "./controller/UserController";
+import { redirectNotLoggedIn } from "./controller/AuthController";
 
 createConnection().then(async () => {
 
@@ -21,14 +22,16 @@ createConnection().then(async () => {
         app.post('/users/login', login)
         app.get('/users', signupPage)
         app.post('/users', signup)
-        app.get('/', bookmarkPage)
-        app.all('/', (_, res) => res.send('ayayayay'))
+        app.post('/bookmark', createBookmark)
+        app.get('/', redirectNotLoggedIn, bookmarkPage)
+        app.all('*', (_, res) => res.send('ayayayay'))
     } catch (e) {
         console.log({ e })
     }
 
     // start express server
-    app.listen(3000);
+    const PORT = parseInt(process.env.PORT) || 3000
+    app.listen(PORT);
 
     console.log(">>> Listening 3000 <<<");
 
