@@ -31,6 +31,6 @@
       "jsonwebtoken": "^8.5.1",
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.0.3",
-      "typeorm": "0.2.19"
+      "typeorm": "0.2.25"
    }
 }
